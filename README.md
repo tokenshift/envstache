@@ -39,5 +39,21 @@ provide a string of JSON:
 ```
 $ echo "Value: {{#some}}{{#nested}}{{value}}{{/nested}}{{/some}}" | \
   envstache --json '{"some": {"nested": {"value": "Got Here"}}}'
- Value: Got Here
- ```
+Value: Got Here
+```
+
+Precedence: Command line args > JSON > environment variables.
+
+Full example:
+
+```
+$ export test_value1="Im an environment variable"
+$ export test_value2="So am i"
+$ export test_value3="Me too"
+$ echo "{{test_value1}}
+> {{test_value2}}
+> {{test_value3}}" | envstache --json '{"test_value2": 42, test_value3": "Hello from JSON"}' test_value2=command_line 
+I'm an environment variable
+command_line
+Hello from JSON
+```
