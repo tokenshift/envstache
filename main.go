@@ -31,6 +31,16 @@ func main() {
 		}
 	}
 
+	// Add key=value pairs from command-line arguments to the model.
+
+	for _, arg := range(os.Args) {
+		split := strings.SplitN(arg, "=", 2)
+		if len(split) == 2 {
+			fmt.Printf("\"%s\" => \"%s\"\n", split[0], split[1])
+			context[split[0]] = split[1]
+		}
+	}
+
 	// Render the template to stdout.
 
 	fmt.Println(template.Render(context))
