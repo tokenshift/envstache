@@ -84,7 +84,7 @@ func main() {
 
 	// Render the template to stdout.
 
-	fmt.Println(template.Render(context))
+	fmt.Print(template.Render(context))
 }
 
 func fatalError(err error) {
