@@ -10,32 +10,10 @@ import (
 	"github.com/hoisie/mustache"
 )
 
-func main() {
-	// Read the template from stdin.
-
-	source, err := ioutil.ReadAll(os.Stdin)
-	fatalError(err)
-
-	template, err := mustache.ParseString(string(source))
-	fatalError(err)
-
-	// Load the context/model from environment variables.
-	
-	context := make(map[string]interface{}, len(os.Environ()))
-	for _, entry := range(os.Environ()) {
-		split := strings.SplitN(entry, "=", 2)
-		lines := strings.Split(split[1], "\n")
-		if len(lines) > 1 {
-			context[split[0]] = lines
-		} else {
-			context[split[0]] = split[1]
-		}
-	}
-
-	// Read JSON model from the command line.
+func readJSON(context map[string]interface{}) {
 
 	var parsed interface{}
-	for i, arg := range(os.Args) {
+	for i, arg := range os.Args {
 		if arg != "--json" {
 			continue
 		}
@@ -52,6 +30,10 @@ func main() {
 		fatalError(err)
 	}
 
+	if parsed == nil {
+		return
+	}
+
 	jMap, ok := parsed.(map[string]interface{})
 	if !ok {
 		fatalError(fmt.Errorf("JSON string must be an object."))
@@ -59,13 +41,40 @@ func main() {
 
 	// Merge the JSON values into the model.
 
-	for k, v := range(jMap) {
+	for k, v := range jMap {
 		context[k] = v
 	}
 
+}
+
+func main() {
+	// Read the template from stdin.
+
+	source, err := ioutil.ReadAll(os.Stdin)
+	fatalError(err)
+
+	template, err := mustache.ParseString(string(source))
+	fatalError(err)
+
+	// Load the context/model from environment variables.
+
+	context := make(map[string]interface{}, len(os.Environ()))
+	for _, entry := range os.Environ() {
+		split := strings.SplitN(entry, "=", 2)
+		lines := strings.Split(split[1], "\n")
+		if len(lines) > 1 {
+			context[split[0]] = lines
+		} else {
+			context[split[0]] = split[1]
+		}
+	}
+
+	// Read JSON model from the command line.
+	readJSON(context)
+
 	// Add key=value pairs from command-line arguments to the model.
 
-	for _, arg := range(os.Args[1:]) {
+	for _, arg := range os.Args[1:] {
 		split := strings.SplitN(arg, "=", 2)
 		if len(split) == 2 {
 			fmt.Printf("\"%s\" => \"%s\"\n", split[0], split[1])
