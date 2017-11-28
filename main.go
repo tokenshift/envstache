@@ -77,7 +77,6 @@ func main() {
 	for _, arg := range os.Args[1:] {
 		split := strings.SplitN(arg, "=", 2)
 		if len(split) == 2 {
-			fmt.Printf("\"%s\" => \"%s\"\n", split[0], split[1])
 			context[split[0]] = split[1]
 		}
 	}
